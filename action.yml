@@ -10,7 +10,7 @@ inputs:
     default: "temurin"
     required: false
   targets:
-    description: 'Targets to execute (default: "clean test assemble"'
+    description: 'Targets to execute (default: "clean test assemble")'
     default: "clean test assemble"
     required: false
 runs:
