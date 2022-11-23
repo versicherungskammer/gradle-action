@@ -14,7 +14,7 @@ inputs:
     default: "clean test assemble"
     required: false
   checkout:
-    description: 'implicitly perfrom checkout'
+    description: 'Implicitly perform checkout'
     default: "true"
     required: false
 runs:
