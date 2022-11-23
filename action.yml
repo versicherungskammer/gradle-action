@@ -13,10 +13,16 @@ inputs:
     description: 'Targets to execute (default: "clean test assemble")'
     default: "clean test assemble"
     required: false
+  checkout:
+    description: 'implicitly perfrom checkout'
+    default: "true"
+    required: false
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v2
+    - name: checkout
+      if: ${{ inputs.checkout == "true" }}
+      uses: actions/checkout@v2
     - name: Setup Java JDK
       uses: actions/setup-java@v2
       with:
