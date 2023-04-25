@@ -21,7 +21,7 @@ runs:
   using: "composite"
   steps:
     - name: checkout
-      if: ${{ inputs.checkout == "true" }}
+      if: ${{ inputs.checkout == 'true' }}
       uses: actions/checkout@v2
     - name: Setup Java JDK
       uses: actions/setup-java@v2
