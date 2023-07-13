@@ -49,6 +49,7 @@ runs:
             echo "disabling publishing because publish-targets are empty"
             publish="0"
           fi
+          echo "  github.event_name = ${{github.event_name}}"
           if [[ ! " ${{inputs.publish-on-events}} " =~ " ${{github.event_name}} " ]]; then
             echo "disabling publishing because github.event_name is ${{github.event_name}}"
             publish="0"
@@ -58,7 +59,7 @@ runs:
             publish="0"
           fi
           if [ "$publish" == "1" ]; then
-            echo "enabled publishing (event_name = github.event_name is ${{github.event_name}})"
+            echo "enabled publishing"
           fi
         fi
         echo "publish=${publish}" >> $GITHUB_ENV
