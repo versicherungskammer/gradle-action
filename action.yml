@@ -49,7 +49,7 @@ runs:
             echo "disabling publishing because publish-targets are empty"
             publish="0"
           fi
-          if [[ " ${{input.publish-on-events}} " =~ " ${{github.event_name}} " ]]; then
+          if [[ " ${{inputs.publish-on-events}} " =~ " ${{github.event_name}} " ]]; then
             echo "disabling publishing because github.event_name is ${{github.event_name}}"
             publish="0"
           fi
