@@ -9,31 +9,74 @@ inputs:
     description: 'JDK distribution to setup (default "temurin")'
     default: "temurin"
     required: false
-  targets:
+  build-targets:
     description: 'Targets to execute (default: "clean test assemble")'
     default: "clean test assemble"
     required: false
-  checkout:
-    description: 'Implicitly perform checkout'
-    default: "true"
+  publish-targets:
+    description: 'Targets to execute only if publishing is enabled (default: "publish")'
+    default: "publish"
+    required: false
+  publish:
+    description: 'if publish-targets should be executed or skipped. (values: "true"/"false"/"auto"; default: "auto"; "auto" skips publishing if job is running because of dependabot or a pull-request-check)'
+    # event types: https://docs.github.com/de/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
+    default: "auto"
+    required: false
+  publish-on-events:
+    description: 'whitelist of event-types that enable publishing'
+    # event types: https://docs.github.com/de/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
+    default: "release push"
     required: false
 runs:
   using: "composite"
   steps:
-    - name: checkout
-      if: ${{ inputs.checkout == "true" }}
-      uses: actions/checkout@v2
+    - name: determine publishing mode
+      run: |
+        publish="0"
+        if [ "${{inputs.push}}" == "true" ]; then
+          if [ "$publish" == "1" -a "${{inputs.publish-targets}}" != "" ]; then
+            echo "publishing explicitly turned on but publish-targets are empty"
+            publish="0"
+          else
+            echo "publishing explicitly turned on"
+            publish="1"
+          fi
+        fi
+        if [ "${{inputs.push}}" == "auto" ]; then
+          echo "auto-detection of publishing..."
+          publish="1"
+          if [ "$publish" == "1" -a "${{inputs.publish-targets}}" != "" ]; then
+            echo "disabling publishing because publish-targets are empty"
+            publish="0"
+          fi
+          if [[ " ${input.publish-on-events} " =~ " ${{github.event_name}} " ]]; then
+            echo "disabling publishing because github.event_name is ${{github.event_name}}"
+            publish="0"
+          fi
+          if [ "$publish" == "1" -a "${{github.actor}}" != "dependabot[bot]" ]; then
+            echo "disabling publishing because actor is dependabot"
+            publish="0"
+          fi
+        fi
+        echo "publish=${publish}" >> $GITHUB_ENV
+      shell: bash
     - name: Setup Java JDK
       uses: actions/setup-java@v2
       with:
         java-version: ${{ inputs.java-version }}
         distribution: ${{ inputs.java-distribution }}
-    - name: build, test
-      run: ./gradlew --no-daemon --info ${{ inputs.targets }}
-      shell: sh
+    - name: build & test
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: ${{ inputs.build-targets }}
     - name: Upload test reports
       if: failure()
       uses: actions/upload-artifact@v1
       with:
         name: test-reports
         path: build/reports/tests/
+    - name: publish
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: ${{ inputs.publish-targets }}
+      if: ${{ env.publish == "1" }}
