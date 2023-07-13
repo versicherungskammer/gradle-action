@@ -79,4 +79,4 @@ runs:
       uses: gradle/gradle-build-action@v2
       with:
         arguments: ${{ inputs.publish-targets }}
-      if: ${{ env.publish == "1" }}
+      if: ${{ env.publish == '1' }}
