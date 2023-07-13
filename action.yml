@@ -34,7 +34,7 @@ runs:
       run: |
         publish="0"
         if [ "${{inputs.publish}}" == "true" ]; then
-          if [ "$publish" == "1" -a "${{inputs.publish-targets}}" != "" ]; then
+          if [ "$publish" == "1" -a -z "${{inputs.publish-targets}}" ]; then
             echo "publishing explicitly turned on but publish-targets are empty"
             publish="0"
           else
@@ -45,7 +45,7 @@ runs:
         if [ "${{inputs.publish}}" == "auto" ]; then
           echo "auto-detection of publishing..."
           publish="1"
-          if [ "$publish" == "1" -a "${{inputs.publish-targets}}" != "" ]; then
+          if [ "$publish" == "1" -a -z "${{inputs.publish-targets}}" ]; then
             echo "disabling publishing because publish-targets are empty"
             publish="0"
           fi
