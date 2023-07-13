@@ -53,7 +53,7 @@ runs:
             echo "disabling publishing because github.event_name is ${{github.event_name}}"
             publish="0"
           fi
-          if [ "$publish" == "1" -a "${{github.actor}}" != "dependabot[bot]" ]; then
+          if [ "$publish" == "1" -a "${{github.actor}}" == "dependabot[bot]" ]; then
             echo "disabling publishing because actor is dependabot"
             publish="0"
           fi
