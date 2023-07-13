@@ -61,7 +61,7 @@ runs:
         echo "publish=${publish}" >> $GITHUB_ENV
       shell: bash
     - name: Setup Java JDK
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: ${{ inputs.java-version }}
         distribution: ${{ inputs.java-distribution }}
@@ -71,7 +71,7 @@ runs:
         arguments: ${{ inputs.build-targets }}
     - name: Upload test reports
       if: failure()
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: test-reports
         path: build/reports/tests/
