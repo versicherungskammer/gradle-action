@@ -30,6 +30,15 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Setup Java JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: ${{ inputs.java-distribution }}
+    - name: build & test
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: ${{ inputs.build-targets }}
     - name: determine publishing mode
       run: |
         publish="0"
@@ -58,21 +67,18 @@ runs:
             echo "disabling publishing because actor is dependabot"
             publish="0"
           fi
-          if [ "$publish" == "1" ]; then
-            echo "enabled publishing"
-          fi
+        fi
+        if ./gradlew --quiet --no-daemon tasks | grep '^publish - '; then
+          echo "publish task detected"
+        else
+          echo "no publish task detected, disabling publishing"
+          publish="0"
+        fi
+        if [ "$publish" == "1" ]; then
+          echo "enabled publishing"
         fi
         echo "publish=${publish}" >> $GITHUB_ENV
       shell: bash
-    - name: Setup Java JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: ${{ inputs.java-version }}
-        distribution: ${{ inputs.java-distribution }}
-    - name: build & test
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: ${{ inputs.build-targets }}
     - name: Upload test reports
       if: failure()
       uses: actions/upload-artifact@v3
