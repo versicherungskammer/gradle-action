@@ -36,7 +36,7 @@ runs:
         java-version: ${{ inputs.java-version }}
         distribution: ${{ inputs.java-distribution }}
     - name: build & test
-      uses: gradle/gradle-build-action@v2
+      uses: gradle/gradle-build-action@v3
       with:
         arguments: ${{ inputs.build-targets }}
     - name: determine publishing mode
@@ -86,7 +86,7 @@ runs:
         name: test-reports
         path: build/reports/tests/
     - name: publish
-      uses: gradle/gradle-build-action@v2
+      uses: gradle/gradle-build-action@v3
       with:
         arguments: ${{ inputs.publish-targets }}
       if: ${{ env.publish == '1' }}
